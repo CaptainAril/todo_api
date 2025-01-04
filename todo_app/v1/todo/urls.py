@@ -1,11 +1,11 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
-from .views import StatusView
+from .views import StatusView, TodoViewSet
 
 router = DefaultRouter()
 
-# router.register('', StatusViewSet, basename='status')
+router.register('', TodoViewSet, basename='todo')
 
 urlpatterns = [
     # path('todo/', TodoViewSet.as_view(), name='todo'),

@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+from datetime import timedelta
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -37,10 +38,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_extensions',
     'rest_framework',
+    'rest_framework_simplejwt',
+    'drf_spectacular',
+    'drf_spectacular_sidecar',
     'drf_yasg',
     
-    'api.v1',
+    'v1.users',
+    'v1.todo',
 ]
 
 MIDDLEWARE = [
@@ -98,27 +104,28 @@ DATABASES = {
 
 
 REST_FRAMEWORK = {
-    # Use Django's standard `django.contrib.auth` permissions,
-    # or allow read-only access for unauthenticated users.
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',
-        # 'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',
-    ]
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
-
-SWAGGER_SETTINS = {
-    'SECURITY_DEFINITIONS': {
-        'Basic': {
-            'type': 'basic'
-        },
-        'Bearer': {
-            'type': 'apiKey',
-        },
-        
-    },
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=35),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 }
 
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'TODO API',
+    'DESCRIPTION': 'API for feature-rich TODO application',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': True,
+    "SERVE_PERMISSIONS": ["rest_framework.permissions.AllowAny"],
+    "SCHEMA_PATH_PREFIX": "/api/v1",
+    'SWAGGER_UI_DIST': 'SIDECAR', 
+    'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
+    'REDOC_DIST': 'SIDECAR',
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -138,6 +145,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTH_USER_MODEL = 'users.User'
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
