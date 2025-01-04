@@ -94,6 +94,20 @@ WSGI_APPLICATION = 'todo_app.wsgi.application'
 #     }
 # }
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'DEBUG',
+    },
+}
+
 DATABASES = {
     'default': dj_database_url.config(
         # Replace this value with your local database's connection string.
