@@ -1,9 +1,16 @@
 from django.contrib.auth import authenticate
+from drf_spectacular.utils import OpenApiExample, extend_schema_serializer
 from rest_framework import serializers
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
 
 from .models import User
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email']
 
 
 class UserSignupSerializer(serializers.ModelSerializer):
@@ -53,6 +60,29 @@ class UserLoginSerializer(serializers.Serializer):
         }
 
 
+@extend_schema_serializer(
+    component_name="LoginResponse",
+    examples=[
+        OpenApiExample(
+            "Login Success Example",
+            value={
+                "refresh": "example-refresh-token",
+                "access": "example-access-token",
+                "user": {
+                    "id": 1,
+                    "username": "exampleuser",
+                    "email": "example@example.com",
+                },
+            },
+        )
+    ],
+)
+class UserLoginResponseSerializer(serializers.Serializer):
+    refresh = serializers.CharField()
+    access = serializers.CharField()
+    user = UserSerializer()
+
+
 class UserLogoutSerializer(serializers.Serializer):
     refresh = serializers.CharField()
     
@@ -70,8 +100,3 @@ class UserLogoutSerializer(serializers.Serializer):
             raise serializers.ValidationError('Token is invalid or expired')
         return {'message': 'Logout successfully'}
 
-
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ['id', 'username', 'email']
