@@ -1,5 +1,7 @@
 from django.db.models import Q
 from django.views import View
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
@@ -9,6 +11,7 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
 
 from .models import Todo
+from .schema import default_responses, task_filter_params
 from .serializers import TodoSerializer
 
 
@@ -28,7 +31,9 @@ class StatusView(APIView):
             }
         )
         
-        
+@extend_schema(
+    responses=default_responses()
+)
 class TodoViewSet(GenericViewSet):
     serializer_class = TodoSerializer
     queryset = Todo.objects.all()
@@ -57,6 +62,15 @@ class TodoViewSet(GenericViewSet):
                 status=status.HTTP_400_BAD_REQUEST
                 )
     
+    @extend_schema(
+        operation_id='get_tasks',
+        parameters=task_filter_params,
+        responses={
+            200: TodoSerializer(many=True),
+            400: OpenApiTypes.OBJECT
+        },
+        
+    )
     @action(detail=False, methods=['GET'], url_path='all')
     def get_tasks(self, request):
         try:
