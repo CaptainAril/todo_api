@@ -29,8 +29,8 @@ SECRET_KEY = 'django-insecure-!a+j87ztj-zz^d$y*wb$a#=a)2j6kf(7#+-ogtif-jw^hgm4fo
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'todo-api-x8qt.onrender.com']
-CSRF_TRUSTED_ORIGINS = ['http://localhost', 'http://127.0.0.1', 'https://todo-api-x8qt.onrender.com']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'todo-api-yh72.onrender.com']
+CSRF_TRUSTED_ORIGINS = ['http://localhost', 'http://127.0.0.1', 'https://todo-api-yh72.onrender.com']
 
 
 # Application definition
@@ -112,7 +112,7 @@ LOGGING = {
 DATABASES = {
     'default': dj_database_url.config(
         # Replace this value with your local database's connection string.
-        default='postgresql://todo_app_db_irp4_user:8sBinCk9y27OlAexs7KRfqTTCWdvKkfA@dpg-ctshpm1u0jms73bamgq0-a/todo_app_db_irp4',
+        default='postgresql://todo_app_db_es5g_user:h4YUjXvY4yR9RD9NZnByDSMCU6c22SbK@dpg-ctta3bq3esus7392k37g-a/todo_app_db_es5g',
         conn_max_age=600
     )
 }
@@ -138,8 +138,8 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=35),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
+    'REFRESH_TOKEN_LIFETIME': timedelta(hours=2),
 }
 
 SPECTACULAR_SETTINGS = {
