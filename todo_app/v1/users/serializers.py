@@ -87,16 +87,9 @@ class UserLogoutSerializer(serializers.Serializer):
     refresh = serializers.CharField()
     
     def validate(self, attrs):
-        print(attrs)
-        token = attrs.get('refresh')
-        print(token)
-        if not token:
+        refresh = attrs.get('refresh')
+        if not refresh:
             raise serializers.ValidationError('Token is required')
         
-        try:
-            token = AccessToken(token)
-            token.blacklist()
-        except Exception:
-            raise serializers.ValidationError('Token is invalid or expired')
-        return {'message': 'Logout successfully'}
-
+        token = RefreshToken(refresh)
+        token.blacklist()

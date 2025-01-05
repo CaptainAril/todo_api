@@ -2,7 +2,7 @@ from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.exceptions import AuthenticationFailed, ValidationError
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -14,6 +14,8 @@ from .serializers import (UserLoginSerializer, UserLogoutSerializer,
 
 class SignUpView(APIView):
     serializer_class = UserSignupSerializer
+    permission_classes = [AllowAny]
+    
     def post(self, request):
         try:
             serializer = self.serializer_class(data=request.data)
@@ -44,6 +46,7 @@ class SignUpView(APIView):
 
 class LoginView(APIView):
     serializer_class = UserLoginSerializer
+    permission_classes = [AllowAny]
     
     @extend_schema(
         request=UserLoginSerializer,
@@ -51,7 +54,6 @@ class LoginView(APIView):
     )
     def post(self, request):
         try:
-            raise NameError('Test error')
             serializer = self.serializer_class(data=request.data)
             serializer.is_valid(raise_exception=True)
             return Response(
@@ -84,15 +86,14 @@ class LogoutView(APIView):
     serializer_class = UserLogoutSerializer
     
     def post(self, request):
-        token = request.META.get('HTTP_AUTHORIZATION').split(' ')[1]
         try:
-            serializer = self.serializer_class(data={**request.data, 'refresh': token})
+            serializer = self.serializer_class(data=request.data)
             serializer.is_valid(raise_exception=True)
             
             return Response(
                 data={
                     "success": True,
-                    "message": serializer.data.get('message'),
+                    "message": 'Logout successfully',
                 },
                 status=status.HTTP_200_OK
             )

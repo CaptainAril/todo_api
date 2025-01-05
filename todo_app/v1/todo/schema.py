@@ -1,5 +1,6 @@
 from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.utils import OpenApiParameter, extend_schema
+from drf_spectacular.utils import (OpenApiExample, OpenApiParameter,
+                                   extend_schema)
 
 # Parameters for task filtering
 task_filter_params = [
@@ -23,6 +24,18 @@ task_filter_params = [
     ),
 ]
 
+# examples = [
+#             OpenApiExample(
+#                 "Missing authentication credentials",
+#                 summary="Bad Request",
+#                 value={"success": False, "message": "Authentication credentials were not provided"},
+#             ),
+#             OpenApiExample(
+#                 "Invalid credentials",
+#                 summary="Bad Request",
+#                 value={"success": False, "message": "Invalid credentials"}
+#             )
+#         ]
 
 
 error_messages = {
@@ -30,8 +43,8 @@ error_messages = {
         "type": "object",
         "properties": {
             "success": {"type": "boolean", "example": False},
-            "message": {"type": "string", "example": "Invalid credentials"},
-            }
+            "message": {"type": "string", "example": "Invalid credentials"}, # "Authentication credentials were not provided."
+            },
         },
     400: {
         "type": "object",
