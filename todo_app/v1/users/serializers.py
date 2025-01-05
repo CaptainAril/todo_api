@@ -93,3 +93,5 @@ class UserLogoutSerializer(serializers.Serializer):
         
         token = RefreshToken(refresh)
         token.blacklist()
+        
+        return {"message": 'Logout successfully',}
