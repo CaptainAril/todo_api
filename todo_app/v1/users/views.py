@@ -14,7 +14,7 @@ from .serializers import (UserLoginSerializer, UserLogoutSerializer,
 
 class SignUpView(APIView):
     serializer_class = UserSignupSerializer
-    permission_classes = [AllowAny]
+    permission_classes = []
     
     def post(self, request):
         try:
@@ -46,7 +46,7 @@ class SignUpView(APIView):
 
 class LoginView(APIView):
     serializer_class = UserLoginSerializer
-    permission_classes = [AllowAny]
+    permission_classes = []
     
     @extend_schema(
         request=UserLoginSerializer,

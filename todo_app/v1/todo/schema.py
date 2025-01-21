@@ -2,6 +2,8 @@ from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import (OpenApiExample, OpenApiParameter,
                                    extend_schema)
 
+from .models import Todo
+
 # Parameters for task filtering
 task_filter_params = [
     OpenApiParameter(
@@ -13,11 +15,13 @@ task_filter_params = [
     OpenApiParameter(
         name="status",
         description="Task status",
+        enum=[status[0] for status in Todo.STATUS_CHOICES],
         required=False,
         type=OpenApiTypes.STR,
     ),
     OpenApiParameter(
         name="priority",
+        enum=[priority[0] for priority in Todo.PRIORITY_CHOICES],
         description="Task priority",
         required=False,
         type=OpenApiTypes.STR,

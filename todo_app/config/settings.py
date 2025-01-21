@@ -14,6 +14,10 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -64,7 +68,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'todo_app.urls'
+ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [
     {
@@ -82,7 +86,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'todo_app.wsgi.application'
+WSGI_APPLICATION = 'config.wsgi.application'
 
 
 # Database
@@ -92,6 +96,24 @@ WSGI_APPLICATION = 'todo_app.wsgi.application'
 #     'default': {
 #         'ENGINE': 'django.db.backends.sqlite3',
 #         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
+DATABASES = {
+    'default': dj_database_url.config(
+        default='postgresql://todo_app_db_es5g_user:h4YUjXvY4yR9RD9NZnByDSMCU6c22SbK@dpg-ctta3bq3esus7392k37g-a/todo_app_db_es5g',
+        conn_max_age=600
+    )
+}
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': '',
+#         'USER': '',
+#         'PASSWORD': '',
+#         'HOST': '',
+#         'PORT': '',
 #     }
 # }
 
@@ -109,31 +131,14 @@ LOGGING = {
     },
 }
 
-DATABASES = {
-    'default': dj_database_url.config(
-        # Replace this value with your local database's connection string.
-        default='postgresql://todo_app_db_es5g_user:h4YUjXvY4yR9RD9NZnByDSMCU6c22SbK@dpg-ctta3bq3esus7392k37g-a/todo_app_db_es5g',
-        conn_max_age=600
-    )
-}
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': '',
-#         'USER': '',
-#         'PASSWORD': '',
-#         'HOST': '',
-#         'PORT': '',
-#     }
-# }
-
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
-    'EXCEPTION_HANDLER': 'todo_app.utils.custom_exception_handler',
+    'EXCEPTION_HANDLER': 'config.utils.custom_exception_handler',
+    'DEFAULT_PAGINATION_CLASS': 'config.utils.CustomPagination',
+    'PAGE_SIZE': 10,
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
@@ -147,7 +152,7 @@ SPECTACULAR_SETTINGS = {
     'DESCRIPTION': 'API for feature-rich TODO application',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': True,
-    "SERVE_PERMISSIONS": ["rest_framework.permissions.AllowAny"],
+    # "SERVE_PERMISSIONS": ["rest_framework.permissions.AllowAny"],
     "SCHEMA_PATH_PREFIX": "/api/v1",
     'SWAGGER_UI_DIST': 'SIDECAR', 
     'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',

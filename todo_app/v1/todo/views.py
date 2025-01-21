@@ -1,9 +1,11 @@
+from config.utils import CustomPagination
 from django.db.models import Q
 from django.views import View
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -15,11 +17,6 @@ from .models import Todo
 from .schema import default_responses, error_messages, task_filter_params
 from .serializers import TodoCollaboratorSerializer, TodoSerializer
 
-
-class TodoPagination(PageNumberPagination):
-    page_size = 10
-    page_size_query_param = 'page_size'
-    max_page_size = 100
 
 class StatusView(APIView):
     def get(self, request):
@@ -45,9 +42,8 @@ class TodoViewSet(GenericViewSet):
             ).order_by('-created_at')
     
     permission_classes = [IsAuthenticated]
-    pagination_class = TodoPagination
+    pagination_class = CustomPagination
 
-    
     @action(detail=False, methods=['POST'], url_path='create')
     def create_task(self, request):
         try:
@@ -62,6 +58,12 @@ class TodoViewSet(GenericViewSet):
                     "data": serializer.data
                 },
                 status=status.HTTP_201_CREATED
+            )
+        except ValidationError as e:
+            result = ", \n ".join(f"{key} - {', '.join(value)}" for key, value in e.args[0].items())
+            return Response(
+                data={"success": False, "message": result},
+                status=status.HTTP_400_BAD_REQUEST
             )
         except Exception as e:
             return Response(
@@ -81,39 +83,39 @@ class TodoViewSet(GenericViewSet):
     @action(detail=False, methods=['GET'], url_path='all')
     def get_tasks(self, request):
         # raise NameError('Test error')
-        # try:
-        todos = self.get_queryset()
-        
-        q = request.query_params.get('q', None)
-        task_status = request.query_params.get('status', None)
-        priority = request.query_params.get('priority', None)
-        
-        if q:
-            todos = todos.filter(
-                Q(title__icontains=q) |
-                Q(description__icontains=q)   
-            )
+        try:
+            todos = self.get_queryset()
             
-        if task_status:
-            todos = todos.filter(status=task_status)
-        if priority:
-            todos = todos.filter(priority=priority)
+            q = request.query_params.get('q', None)
+            task_status = request.query_params.get('status', None)
+            priority = request.query_params.get('priority', None)
             
-        paginator = self.pagination_class()
-        paginated_todos = paginator.paginate_queryset(todos, request)
-        serializer = self.serializer_class(paginated_todos, many=True)
-        
-        return paginator.get_paginated_response({
-            "success": True,
-            "message": "Todos fetched successfully",
-            "data": serializer.data
-        })
+            if q:
+                todos = todos.filter(
+                    Q(title__icontains=q) |
+                    Q(description__icontains=q)   
+                )
+                
+            if task_status:
+                todos = todos.filter(status=task_status)
+            if priority:
+                todos = todos.filter(priority=priority)
+                
+            paginator = self.pagination_class()
+            paginated_todos = paginator.paginate_queryset(todos, request)
+            serializer = self.serializer_class(paginated_todos, many=True)
             
-        # except Exception as e:
-        #     return Response(
-        #         data={"success": False, "message": str(e)},
-        #         status=status.HTTP_400_BAD_REQUEST
-        #         )  
+            return paginator.get_paginated_response({
+                "success": True,
+                "message": "Todos fetched successfully",
+                "data": serializer.data
+            })
+            
+        except Exception as e:
+            return Response(
+                data={"success": False, "message": str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+                )  
     
     @action(detail=False, methods=['GET'], url_path='(?P<task_id>[0-9]+)')
     def get_task(self, request, **kwargs):
@@ -157,6 +159,58 @@ class TodoViewSet(GenericViewSet):
                 status=status.HTTP_400_BAD_REQUEST
                 )
 
+    @extend_schema(
+        request=None,
+    )
+    @action(detail=False, methods=['PUT'], url_path='(?P<task_id>[0-9]+)/mark-complete')
+    def mark_complete(self, request, **kwargs):
+        try:
+            pk = kwargs.get('task_id')
+            todo = self.get_queryset().get(pk=pk)
+            todo.status = 'completed'
+            todo.save()
+            serializer = self.serializer_class(todo,)
+            
+            return Response(
+                {
+                    "success": True,
+                    "message": "Todo marked Completed",
+                    "data": serializer.data
+                }
+            )
+        except Exception as e:
+            return Response(
+                data={"success": False, "message": str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+                )
+    
+    
+    @extend_schema(
+        request=None,
+    )
+    @action(detail=False, methods=['PUT'], url_path='(?P<task_id>[0-9]+)/in-progress')
+    def start_task(self, request, **kwargs):
+        try:
+            pk = kwargs.get('task_id')
+            todo = self.get_queryset().get(pk=pk)
+            todo.status = 'in_progress'
+            todo.save()
+            serializer = self.serializer_class(todo)
+            
+            return Response(
+                {
+                    "success": True,
+                    "message": "Todo marked In Progress",
+                    "data": serializer.data
+                }
+            )
+        except Exception as e:
+            return Response(
+                data={"success": False, "message": str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+                )
+
+    
     @action(detail=False, methods=['DELETE'], url_path='(?P<task_id>[0-9]+)/delete')
     def delete_task(self, request, **kwargs):
         try:
