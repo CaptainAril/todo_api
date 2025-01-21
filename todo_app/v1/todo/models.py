@@ -20,7 +20,7 @@ class Todo(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
-    priority = models.IntegerField(choices=PRIORITY_CHOICES, default=1) # 1: Low, 2: Medium, 3: High  
+    priority = models.CharField(max_length=9, choices=PRIORITY_CHOICES, default=1) # 1: Low, 2: Medium, 3: High  
     due_date = models.DateField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

@@ -10,8 +10,13 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+import os
 from datetime import timedelta
 from pathlib import Path
+
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -59,7 +64,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'todo_app.urls'
+ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [
     {
@@ -77,7 +82,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'todo_app.wsgi.application'
+WSGI_APPLICATION = 'config.wsgi.application'
 
 
 # Database
@@ -107,7 +112,9 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
-    'EXCEPTION_HANDLER': 'todo_app.utils.custom_exception_handler',
+    'EXCEPTION_HANDLER': 'config.utils.custom_exception_handler',
+    'DEFAULT_PAGINATION_CLASS': 'config.utils.CustomPagination',
+    'PAGE_SIZE': 10,
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
@@ -121,7 +128,7 @@ SPECTACULAR_SETTINGS = {
     'DESCRIPTION': 'API for feature-rich TODO application',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': True,
-    "SERVE_PERMISSIONS": ["rest_framework.permissions.AllowAny"],
+    # "SERVE_PERMISSIONS": ["rest_framework.permissions.AllowAny"],
     "SCHEMA_PATH_PREFIX": "/api/v1",
     'SWAGGER_UI_DIST': 'SIDECAR', 
     'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
